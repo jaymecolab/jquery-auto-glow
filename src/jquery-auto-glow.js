@@ -4,9 +4,10 @@
   function parseOptions(options) {
     return {
       RADIUS:     (options.radius    || 20),
-      DURATION:   (options.duration  || 500),
+      DURATION:   (options.duration  || 900),
       TEXT_COLOR: (options.textColor || '#fff'),
-      HALO_COLOR: (options.haloColor || '#777')
+      HALO_COLOR: (options.haloColor || '#777'),
+      AUTO:       (options.auto      || 'on')
     }
   }
 
@@ -37,31 +38,47 @@
   function addGlow(opts) {
     var opts = parseOptions(opts || { });
 
-    function startGlow() {
-      $(this).stop().animate({
+    function startGlow(obj, number) {
+      $(obj).stop().animate({
         color: opts.TEXT_COLOR,
         textShadow: {
-          begin: true,
+          //begin: true,
           color: opts.HALO_COLOR,
           radius: opts.RADIUS
         }
       }, opts.DURATION);
+      setTimeout(function(){ startFade(obj); }, opts.DURATION);
     }
 
-    function startFade() {
-      $(this).stop().animate({
-        color: $(this).data('glow.originColor'),
+    function startFade(obj) {
+      $(obj).stop().animate({
+        color: '#999999', //$(obj).data('glow.originColor'),
         textShadow: {
-          begin: false,
+          //begin: false,
           color: opts.HALO_COLOR,
-          radius: opts.RADIUS
+          radius: 0
         }
-      }, opts.DURATION);
+      }, opts.DURATION*0.5);
     }
 
     with($(this)) {
+
+      //random num gen
+      var numRand = Math.floor((Math.random()*1000)+800); 
+      var bigNumRand = Math.floor((Math.random()*3000)+1000);
+      $(this).each( function(){
+        var number = numRand;
+        var bigNumber = bigNumRand;
+        var obj = $(this);
+        var t=setTimeout( function(){ startGlow(obj,number); }, number);
+        var i=setInterval( function(){ startGlow(obj,number); }, bigNumber);
+        
+      });
+      
+      /*
       bind('mouseenter', startGlow);
       bind('mouseleave', startFade);
+      */
       data('glow.originColor', css('color'));
       data('glow.originalGlow', (css('text-shadow') || 'none'));
     }
